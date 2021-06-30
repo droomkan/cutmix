@@ -4,10 +4,9 @@ import cv2
 import numpy as np
 
 
-def image_resize(image, width = None, height = None, inter = cv2.INTER_AREA):
+def image_resize(image, width=None, height=None, inter=cv2.INTER_AREA):
     # initialize the dimensions of the image to be resized and
     # grab the image size
-    dim = None
     (h, w) = image.shape[:2]
 
     # if both the width and height are None, then return the
@@ -30,7 +29,7 @@ def image_resize(image, width = None, height = None, inter = cv2.INTER_AREA):
         dim = (width, int(h * r))
 
     # resize the image
-    resized = cv2.resize(image, dim, interpolation = inter)
+    resized = cv2.resize(image, dim, interpolation=inter)
 
     # return the resized image
     return resized, r
@@ -108,6 +107,10 @@ def plot_one_box(x, img, color=None, label=None, line_thickness=None):
 
 
 def xywh2xyxy(boxes):
+    """
+    :param boxes: Bounding boxes based in YOLOv4 format center_x, center_y, w, h
+    :return: Adjusted bounding boxes of format x1, y1, x2, y2
+    """
     c_boxes = boxes.copy()
 
     for box in c_boxes:
@@ -134,7 +137,23 @@ def xyxy2xywh(boxes):
 
     return c_boxes
 
+
 def load_labels(labels_file):
     with open(labels_file, 'r') as f:
         labels = np.array([x.split() for x in f.read().splitlines()], dtype=np.float32)  # labels
     return labels
+
+
+def get_absolute_coords(boxes, img_w, img_h):
+    boxes[:, [1, 3]] = boxes[:, [1, 3]] * img_w
+    boxes[:, [2, 4]] = boxes[:, [2, 4]] * img_h
+    return boxes
+
+
+def get_relative_coords(boxes, img_w, img_h):
+    boxes[:, [1, 3]] = boxes[:, [1, 3]] / img_w
+    boxes[:, [2, 4]] = boxes[:, [2, 4]] / img_h
+    return boxes
+
+
+    
